@@ -53,7 +53,7 @@ def parseApp(tokens):
     else:
         t1=parseTerm(tokens)
     
-    if not(tokens.nextIsName()):
+    if not(tokens.nextIsName() or (tokens.next()=='(')):
         return t1
     else:
         t2 = parseName(tokens)
