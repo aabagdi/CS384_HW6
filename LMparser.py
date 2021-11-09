@@ -40,8 +40,6 @@ def parseTerm(tokens):
         tokens.eat('(')
         t = parseTerm(tokens)
         tokens.eat(')')
-        if tokens.next() == ';':
-            tokens.eat(';')
         return t 
     #
     #<term> ::= <app>
