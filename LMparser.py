@@ -16,10 +16,10 @@ def parseDef(tokens):
     #<def>  ::= <name> := <term>; | <def>;<def>
     #
     seq = ["Defs"]
-    while tokens.nextIsName():
+    while tokens.next() != "eof":
         x = parseName(tokens)
         tokens.eat(":=")
-        t= parseTerm(tokens)
+        t = parseTerm(tokens)
         tokens.eat(';')
         seq.append(["LM",x,t])
     return seq 
