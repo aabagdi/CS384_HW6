@@ -100,18 +100,22 @@ def loadAll(files):
         print("Bad token reached.")
         print(e.args[0])
         print("Bailing command-line loading.")
-def prettyprint(ast,indent=0):
-    if not isinstance(ast,list):
-        print((" "*(indent-1)),ast)
-    else:
-        if len(ast) == 1:
-            print((" "*indent)+ast[0])
+def LsttoStr(ast):
+    if ast[0] == "VA":
+        return "VA(\""+ast[1]+"\")"
+    if ast[0] == "LM":
+        return "LM("+LsttoStr(ast[1])+","+LsttoStr(ast[2])+")"
+    if ast[0] == "AP":
+         return "AP("+LsttoStr(ast[1])+","+LsttoStr(ast[2])+")"
+def prettyprint(ast):
+    count = 1
+    for term in ast:
+        if term == "Defs":
+            print('let')
         else:
-            print((" "*indent)+ast[0])
-            i=1
-            while i<len(ast):
-                prettyprint(ast[i],indent+len(ast[0]))
-                i=i+1
+            if term[0]=="Def":
+                print('val x'+str(count)+' = '+LsttoStr(term[1]))
+                print('val t'+str(count)+' = '+LsttoStr(term[2]))
 
 #
 # Exceptions
