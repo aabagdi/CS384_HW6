@@ -5,64 +5,71 @@
 #
 
 import sys
-
 # The recursive descent parser for the (disambiguated) grammar
-#<def>  ::= <name> := <term>; | <def>;<def>
-#<term> ::= fn <name> => <term>|(<term>)|<app>
-#<app>  ::= <term><term>|<name>
+#<def>  ::= <name> := <app>; | <def>;<def>
+#<app>  ::= <term><term>|<term>
+#<term> ::= fn <name> => <term>|(<app>)|<name>
 #<name> ::= zero | fib | main
 def parseDef(tokens):
     #
     #<def>  ::= <name> := <term>; | <def>;<def>
     #
     seq = ["Defs"]
+
     while tokens.next() != "eof":
+        where = tokens.report()
         x = parseName(tokens)
         tokens.eat(":=")
-        t = parseTerm(tokens)
+        t = parseApp(tokens)
         tokens.eat(';')
-        seq.append(["LM",x,t])
-    return seq 
+        seq.append(["Def",x,t,where])
+    return seq
+def parseApp(tokens):
+    #I have 
+    #<app>  ::= <term> <term>|<term>
+    #I want 
+    #<app>  ::= <app> <term>|<term>
+    where = tokens.report()
+    t1 = parseTerm(tokens)
+
+    #<app> ::= <term>
+    if not(tokens.nextIsName() or (tokens.next() =='(')):
+        return t1
+    
+    #<app> ::= <term><term>
+    else:
+        t2=parseTerm(tokens)
+        return["AP",t1,t2,where]
+
 def parseTerm(tokens):
     #
     #<term> ::= fn <name> => <term>
     #
     if tokens.next() == 'fn':
+        where = tokens.report()
         tokens.eat('fn')
         x = parseName(tokens)
         tokens.eat('=>')
         t = parseTerm(tokens)
-        return ["LM",x,t]
+        return ["LM",x,t,where]
     #
     #<term> ::= (<term>)
     #
     if tokens.next() == '(':
         tokens.eat('(')
-        t = parseTerm(tokens)
+        t = parseApp(tokens)
         tokens.eat(')')
         return t 
     #
-    #<term> ::= <app>
+    #<term> ::= <name>
     #
-    else: return parseApp(tokens)
-
-def parseApp(tokens):
-    #<app>  ::= <term> <term>|<name>
-    if tokens.nextIsName():
-        t1 = parseName(tokens)
-    else:
-        t1=parseTerm(tokens)
-    
-    if not(tokens.nextIsName() or (tokens.next()=='(')):
-        return t1
-    else:
-        t2 = parseName(tokens)
-    return["AP",t1,t2]
+    else: return parseName(tokens)
 
 def parseName(tokens):
     if tokens.nextIsName():
+        where = tokens.report()
         x = tokens.eatName()
-        return["VA",x]
+        return["VA",x,where]
     else: 
         e = "Expected a name"
         raise LexError(e)
@@ -78,6 +85,7 @@ def reportPlace(expn):
 def parse(entry):
     tks = TokenStream(entry)
     ast = parseDef(tks)
+    print(ast)
     if not tks.atEOF():
         raise SyntaxError("Some unconsumed tokens remain.")
     print()
@@ -100,22 +108,30 @@ def loadAll(files):
         print("Bad token reached.")
         print(e.args[0])
         print("Bailing command-line loading.")
-def LsttoStr(ast):
+
+def ASTtoStr(ast):
     if ast[0] == "VA":
         return "VA(\""+ast[1]+"\")"
     if ast[0] == "LM":
-        return "LM("+LsttoStr(ast[1])+","+LsttoStr(ast[2])+")"
+        return "LM("+ASTtoStr(ast[1])+","+ASTtoStr(ast[2])+")"
     if ast[0] == "AP":
-         return "AP("+LsttoStr(ast[1])+","+LsttoStr(ast[2])+")"
+         return "AP("+ASTtoStr(ast[1])+","+ASTtoStr(ast[2])+")"
+def ExtractName(ast):
+    if ast[0] == "VA":
+        return ast[1]
+    e = "Expected a name"
+    raise LexError(e)
+    return e
 def prettyprint(ast):
     count = 1
+    
     for term in ast:
         if term == "Defs":
             print('let')
         else:
             if term[0]=="Def":
-                print('val x'+str(count)+' = '+LsttoStr(term[1]))
-                print('val t'+str(count)+' = '+LsttoStr(term[2]))
+                print('val x'+str(count)+' = '+ExtractName(term[1]))
+                print('val t'+str(count)+' = '+ASTtoStr(term[2]))
 
 #
 # Exceptions
@@ -141,7 +157,7 @@ RESERVED = ['fn','=>',':=']
 DELIMITERS = '();'
 
 # Characters that might make up unary and binary operations.
-OPERATORS = '=>:=' 
+OPERATORS = ':=,=>' 
 
 
 #
@@ -224,8 +240,8 @@ class TokenStream:
         Helper function used to report the location of errors in the 
         source code.
         """
-        print(self.starts)
-        print(self.tokens)
+        #print(self.starts)
+        #print(self.tokens)
         lnum = self.starts[0][0]
         cnum = self.starts[0][1]
         return self.sourcename + " line "+str(lnum)+" column "+str(cnum)
