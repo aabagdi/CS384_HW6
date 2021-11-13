@@ -10,6 +10,7 @@ import sys
 #<app>  ::= <term><term>|<term>
 #<term> ::= fn <name> => <term>|(<app>)|<name>
 #<name> ::= zero | fib | main
+
 def parseDef(tokens):
     #
     #<def>  ::= <name> := <term>; | <def>;<def>
@@ -113,24 +114,40 @@ def ASTtoStr(ast):
         return "LM("+ExtractName(ast[1])+","+ASTtoStr(ast[2])+")"
     if ast[0] == "AP":
          return "AP("+ASTtoStr(ast[1])+","+ASTtoStr(ast[2])+")"
+
 def ExtractName(ast):
     if ast[0] == "VA":
          return "\""+ast[1]+"\""
     e = "Expected a name"
     raise LexError(e)
     return e
+
 def prettyprint(ast):
-    count = 1
-    
+    count = 0
     for term in ast:
         if term == "Defs":
             print('let')
         else:
+            N = ExtractName(term[1])
+            T = ASTtoStr(term[2])
             if term[0]=="Def":
-                print('val x'+str(count)+' = '+ExtractName(term[1]))
-                print('val t'+str(count)+' = '+ASTtoStr(term[2]))
-    print()
+                if (N=="\"main\""):
+                    print('val t'+' = '+T)
+                else:
+                    print('val x'+str(count)+' = '+N)
+                    print('val t'+str(count)+' = '+T)
+                count=count+1
+    main = 'val main = '
+    for i in range(count-1):
+        main=main+"AP(LM(x"+str(i+1)+","
 
+    main = main+"t),"
+    for i in range(count-1,1,-1):
+        main=main+"t"+str(i)+")),"
+    if count>1: main=main+"t1)"
+    print(main)
+    print("val value = norReduce main\nin\n\tprint (pretty value)\nend")
+    print()
 #
 # Exceptions
 #
