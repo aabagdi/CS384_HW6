@@ -135,17 +135,18 @@ def prettyprint(ast):
                 if (N=="\"main\""):
                     print('val t'+' = '+T)
                 else:
-                    print('val x'+str(count)+' = '+N)
-                    print('val t'+str(count)+' = '+T)
+                    print('val x'+str(count+1)+' = '+N)
+                    print('val t'+str(count+1)+' = '+T)
                 count=count+1
     main = 'val main = '
     for i in range(count-1):
         main=main+"AP(LM(x"+str(i+1)+","
 
     main = main+"t"
-    if count>1: main=main+"t),"
+    if count>1: main=main+"),"
     for i in range(count-1,1,-1):
         main=main+"t"+str(i)+")),"
+    if count>1: main=main+"t1)"
     print(main)
     print("val value = norReduce main\nin\n\tprint (pretty value)\nend")
     print()
