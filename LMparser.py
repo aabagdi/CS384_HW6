@@ -5,7 +5,6 @@
 #
 
 import sys
-import os
 # The recursive descent parser for the (disambiguated) grammar
 #<def>  ::= <name> := <app>; | <def>;<def>
 #<app>  ::= <term><term>|<term>
