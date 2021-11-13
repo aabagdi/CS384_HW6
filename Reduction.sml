@@ -10,8 +10,11 @@ fun getFreshVariable v =
         in (v ^ (Int.toString i))
     end;
 
-fun alphaRename x s(Var(t)) = Var(t)
-  | alphaRename x s(Lam(y,t)) = Lam(y,t)
-  | alphaRename x s(App(t1,t2))= App(t1,t2);
+fun alphaRename x s (Var(t)) = if x=t then Var(s) 
+else Var(t)
+  | alphaRename x s(Lam(y,t)) = if x=y then Lam(y,t) else 
+    let val z = getFreshVariable "z" in
+    Lam(z,(alphaRename x s (alphaRename y z t))) end
+  | alphaRename x s(App(t1,t2))= App((alphaRename x s t1),(alphaRename x s t2));
 
  
