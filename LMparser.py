@@ -118,7 +118,7 @@ def ASTtoStr(ast):
          return "AP("+ASTtoStr(ast[1])+","+ASTtoStr(ast[2])+")"
 def ExtractName(ast):
     if ast[0] == "VA":
-        return ast[1]
+        return "\"ast[1]\""
     e = "Expected a name"
     raise LexError(e)
     return e
