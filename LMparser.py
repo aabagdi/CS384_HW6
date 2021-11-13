@@ -5,6 +5,7 @@
 #
 
 import sys
+import os
 # The recursive descent parser for the (disambiguated) grammar
 #<def>  ::= <name> := <app>; | <def>;<def>
 #<app>  ::= <term><term>|<term>
@@ -124,6 +125,7 @@ def ExtractName(ast):
 
 def prettyprint(ast):
     count = 0
+    sys.stdout = open('parse.sml', 'w')
     for term in ast:
         if term == "Defs":
             print('let')
@@ -141,13 +143,14 @@ def prettyprint(ast):
     for i in range(count-1):
         main=main+"AP(LM(x"+str(i+1)+","
 
-    main = main+"t),"
+    main = main+"t"
+    if count>1: main=main+"t),"
     for i in range(count-1,1,-1):
         main=main+"t"+str(i)+")),"
-    if count>1: main=main+"t1)"
     print(main)
     print("val value = norReduce main\nin\n\tprint (pretty value)\nend")
     print()
+
 #
 # Exceptions
 #
