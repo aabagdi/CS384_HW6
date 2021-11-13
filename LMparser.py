@@ -7,7 +7,7 @@
 import sys
 # The recursive descent parser for the (disambiguated) grammar
 #<def>  ::= <name> := <app>; | <def>;<def>
-#<app>  ::= <app><term>|<term>
+#<app>  ::= <term><term>|<term>
 #<term> ::= fn <name> => <term>|(<app>)|<name>
 #<name> ::= zero | fib | main
 def parseDef(tokens):
@@ -24,8 +24,9 @@ def parseDef(tokens):
         tokens.eat(';')
         seq.append(["Def",x,t,where])
     return seq
-def parseApp(tokens):
+def parseApp(tokens): 
     #<app>  ::= <app> <term>|<term>
+
     #<app> ::= <term>
     where = tokens.report()
     t1 = parseTerm(tokens)
@@ -128,6 +129,7 @@ def prettyprint(ast):
             if term[0]=="Def":
                 print('val x'+str(count)+' = '+ExtractName(term[1]))
                 print('val t'+str(count)+' = '+ASTtoStr(term[2]))
+    print()
 
 #
 # Exceptions
