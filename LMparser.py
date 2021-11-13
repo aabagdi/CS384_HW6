@@ -33,13 +33,12 @@ def parseApp(tokens):
     t1 = parseTerm(tokens)
 
     #<app> ::= <term>
-    if not(tokens.nextIsName() or (tokens.next() =='(')):
-        return t1
+    while tokens.nextIsName() or (tokens.next() =='('):
+        where = tokens.report()
+        t2 = parseTerm(tokens)
+        t1 = ["AP",t1,t2,where]
     
-    #<app> ::= <term><term>
-    else:
-        t2=parseTerm(tokens)
-        return["AP",t1,t2,where]
+    return t1 
 
 def parseTerm(tokens):
     #
@@ -50,7 +49,7 @@ def parseTerm(tokens):
         tokens.eat('fn')
         x = parseName(tokens)
         tokens.eat('=>')
-        t = parseTerm(tokens)
+        t = parseApp(tokens)
         return ["LM",x,t,where]
     #
     #<term> ::= (<term>)
@@ -85,7 +84,6 @@ def reportPlace(expn):
 def parse(entry):
     tks = TokenStream(entry)
     ast = parseDef(tks)
-    print(ast)
     if not tks.atEOF():
         raise SyntaxError("Some unconsumed tokens remain.")
     print()
@@ -113,12 +111,12 @@ def ASTtoStr(ast):
     if ast[0] == "VA":
         return "VA(\""+ast[1]+"\")"
     if ast[0] == "LM":
-        return "LM("+ASTtoStr(ast[1])+","+ASTtoStr(ast[2])+")"
+        return "LM("+ExtractName(ast[1])+","+ASTtoStr(ast[2])+")"
     if ast[0] == "AP":
          return "AP("+ASTtoStr(ast[1])+","+ASTtoStr(ast[2])+")"
 def ExtractName(ast):
     if ast[0] == "VA":
-        return "\""+ast[1]+"\""
+         return "\""+ast[1]+"\""
     e = "Expected a name"
     raise LexError(e)
     return e
