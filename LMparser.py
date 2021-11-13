@@ -7,7 +7,7 @@
 import sys
 # The recursive descent parser for the (disambiguated) grammar
 #<def>  ::= <name> := <app>; | <def>;<def>
-#<app>  ::= <term><term>|<term>
+#<app>  ::= <app><term>|<term>
 #<term> ::= fn <name> => <term>|(<app>)|<name>
 #<name> ::= zero | fib | main
 def parseDef(tokens):
@@ -25,14 +25,12 @@ def parseDef(tokens):
         seq.append(["Def",x,t,where])
     return seq
 def parseApp(tokens):
-    #I have 
-    #<app>  ::= <term> <term>|<term>
-    #I want 
     #<app>  ::= <app> <term>|<term>
+    #<app> ::= <term>
     where = tokens.report()
     t1 = parseTerm(tokens)
 
-    #<app> ::= <term>
+    #<app> ::= <app> <term>
     while tokens.nextIsName() or (tokens.next() =='('):
         where = tokens.report()
         t2 = parseTerm(tokens)
