@@ -1,0 +1,23 @@
+\documentclass[12pt]{article}
+\usepackage{amssymb}
+\begin{document}
+\paragraph{Part 5}
+\subparagraph{Power:}
+\raggedright
+
+power $n$ $m$ := $\lambda n. \lambda m.n$ (times $m$) succ 0
+\subparagraph{Pred:}
+pred $n:= \lambda n$.snd.pair (succ (fst $p$)) (fst $p$) where $p := $ pair 0 0
+\subparagraph{Minus:} 
+minus $n$ $m := \lambda n. \lambda m.n$ pred $m$
+\subparagraph{Less:}
+less $n$ $m := \lambda n. \lambda m.$is-zero (minus $n$ $m$)
+\subparagraph{Equal:}
+equal $n$ $m := \lambda n. \lambda m$
+\subparagraph{Fibbit:}
+fibbit $n := \lambda n$
+\subparagraph{Div2:}
+div2 $n := \lambda n.$fst($n$ $t$ $p_{0}$) where $p_{0} := $pair 0 0, $t := \lambda p.$pair (snd $p$) (succ (fst $p$))
+\subparagraph{Fibrec:}
+fibrec $n :=$ Y (fibTemplate) $n$ where fibTemplate $n := \lambda f.\lambda n$(less $n$ 2) 1 f (plus (minus $n$ 2) (minus $n$ 1))
+\enddocument
