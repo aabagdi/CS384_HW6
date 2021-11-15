@@ -27,7 +27,7 @@ fun pretty (VA(x)) = x
   | pretty (AP(t1,t2)) = (pretty t1) ^"("^(pretty t2)^")";
 
 fun norReduce (VA(t)) = VA(t)
-  | norReduce (LM(x,t)) = if irr t then (LM(x,t)) else  let val newT = norReduce t in norReduce(LM(x,newT)) end
+  | norReduce (LM(x,t)) = LM(x, norReduce t)
   | norReduce (AP(LM(x,t),s)) = 
 if irr t 
 then if irr s 
