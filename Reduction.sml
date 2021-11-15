@@ -46,13 +46,6 @@ else let val Nt1 = norReduce t1 in norReduce(AP(Nt1,t2)) end;
 
 
 
-fun clear (VA(x)) = "VA("^x^")"
-  | clear (LM(x,t)) = "LM("^x^","^(clear t)^")"
-  | clear (AP(t1,t2)) = "AP("^(clear t1)^","^(clear t2)^")";
-
-
-
-
   
   
 
