@@ -10,28 +10,40 @@ fun getFreshVariable v =
         in (v ^ (Int.toString i))
     end;
 
-fun alphaRename x s (VA(t)) = if x=t then VA(s) 
+fun alphaRename (VA(x)) s (VA(t)) = if x=t then s 
 else VA(t)
-  | alphaRename x s(LM(y,t)) = if x=y then LM(y,t) else 
+  | alphaRename (VA(x)) s (LM(y,t)) = if x=y then LM(y,t) else 
     let val z = getFreshVariable "z" in
-    LM(z,(alphaRename x s (alphaRename y z t))) end
-  | alphaRename x s(AP(t1,t2))= AP((alphaRename x s t1),(alphaRename x s t2));
+    LM(z,(alphaRename (VA(x)) s (alphaRename (VA(y)) (VA(z)) t))) end
+  | alphaRename (VA(x)) s (AP(t1,t2))= AP((alphaRename (VA(x)) s t1),(alphaRename (VA(x)) s t2));
 
 fun irr (VA(t)) = true
   | irr (LM(x,t)) = irr t
-  | irr (AP(t1,t2)) = if irr t1 then irr t2 else false;
+  | irr (AP(t1,t2)) = false;
 
 fun norReduce (VA(t)) = VA(t)
   | norReduce (LM(x,t)) = LM(x, norReduce t)
-  | norReduce (AP(t1,t2)) = if irr t1 then norReduce (AP((norReduce t1),t2)) else norReduce (AP(t1,(norReduce t2)));
+  | norReduce (AP(LM(x,t),s)) = 
+if irr t 
+then if irr s 
+     then alphaRename (VA(x)) s t 
+     else
+          let val News =  norReduce s in norReduce (AP(LM(x,t), News )) end 
+else let val newT = norReduce (LM(x,t)) in norReduce (AP(newT, s )) end 
+  |norReduce(AP(t1,t2)) = AP(t1,t2);
+
+
+fun pretty (VA(x)) = x
+  | pretty (LM(x,t)) = "fn "^x^" => "^(pretty t)
+  | pretty (AP(t1,t2)) = "("^ (pretty t1) ^")("^(pretty t2)^")";
 
 let
-val x0 = "two"
-val t0 = LM("f",LM("x",AP(VA("f"),AP(VA("f"),VA("x")))))
-val x1 = "succ"
-val t1 = LM("n",LM("f",LM("x",AP(VA("f"),AP(AP(VA("n"),VA("f")),VA("x"))))))
-val x2 = "plus"
-val t2 = LM("n",AP(VA("n"),VA("succ")))
-val t = AP(AP(VA("plus"),VA("two")),VA("two"))
-val main = AP(LM(x1,AP(LM(x2,t),t2)),t1)
-in norReduce main end;
+val x1 = "zero"
+val t1 = LM("f",LM("x",VA("x")))
+val t = VA("zero")
+val main = AP(LM(x1,t),t1)
+val value = norReduce main
+in
+	print (pretty value)
+end;
+
