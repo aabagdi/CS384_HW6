@@ -15,7 +15,7 @@ less $n$ $m := \lambda n. \lambda m.$is-zero (minus $n$ $m$)
 \subparagraph{Equal:}
 equal $n$ $m := \lambda n. \lambda m$
 \subparagraph{Fibbit:}
-fibbit $n := \lambda n. \lambda p. p.$fst.pair (plus (fst $p$) (snd $p$)) fst $p$ where $p := $ pair 0 1
+fibbit $n := \lambda n.p.$fst.pair (plus (fst $p$) (snd $p$)) fst $p$ where $p := $ pair 0 1
 \subparagraph{Div2:}
 div2 $n := \lambda n.$fst($n$ $t$ $p_{0}$) where $p_{0} := $pair 0 0, $t := \lambda p.$pair (snd $p$) (succ (fst $p$))
 \subparagraph{Fibrec:}
