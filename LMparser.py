@@ -1,10 +1,11 @@
 #
-# CSCI 384 : parser.py
+# CSCI 384 : LMparser.py
 # 
 # recursive-descent parser for lambda calculus expressions
 #
 
 import sys
+import os
 # The recursive descent parser for the (disambiguated) grammar
 #<def>  ::= <name> := <app>; | <def>;<def>
 #<app>  ::= <term><term>|<term>
@@ -86,10 +87,7 @@ def parse(entry):
     ast = parseDef(tks)
     if not tks.atEOF():
         raise SyntaxError("Some unconsumed tokens remain.")
-    print()
     prettyprint(ast)
-    print()
-
 def loadAll(files):
     try:
         # Load definitions from the specified source files.
@@ -125,6 +123,9 @@ def ExtractName(ast):
 def prettyprint(ast):
     count = 0
     sys.stdout = open('parse.sml', 'w')
+    with open('Reduction.sml') as SML:
+        text=SML.read()
+        print(text)
     for term in ast:
         if term == "Defs":
             print('let')
@@ -148,7 +149,7 @@ def prettyprint(ast):
         main=main+"t"+str(i)+")),"
     if count>1: main=main+"t1)"
     print(main)
-    print("val value = norReduce main\nin\n\tprint (pretty value)\nend")
+    print("val value = norReduce main\nin\n\tprint (pretty value)\nend;")
     print()
 
 #
